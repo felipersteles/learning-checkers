@@ -28,5 +28,5 @@ No external libraries or frameworks required - just the core pillars of web deve
 ## Contributions Welcome:
 
 We eagerly invite pull requests for bug fixes, feature enhancements, and creative ideas to further enrich the project.
-
+##
 ## Join the checkers revolution and rediscover this timeless classic in its pure web form!
