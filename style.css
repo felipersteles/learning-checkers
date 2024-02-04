@@ -1,0 +1,166 @@
+body, html{
+    height: 100%;
+    margin: 0;
+    background: #030020;
+    width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+  }
+  
+  header{
+    background: url("https://i.pinimg.com/736x/b2/16/b1/b216b127ca8997e14baf88085efa2573.jpg");
+    background-repeat: no-repeat  ;
+    background-size: cover;
+    height: 15vh;
+    width: 100%;
+    position: fixed;
+    top: 0;
+  }
+  
+  .firstSection{
+    position: relative;
+    top: 15vh;
+  }
+  
+  h1, h3,h6{
+    margin: 0;
+    color: white;
+  }
+  
+  #logo{
+    display: flex;
+    height: 100%;
+    font-family: "Lucida Sans"; 
+    background-color: #27272723;
+  }
+  
+  .teles{
+    text-decoration: none;
+    font-size: 95px;
+  }
+  .teles:hover{
+    color: white;
+    -webkit-text-fill-color: black; /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 1.5px;
+    -webkit-text-stroke-color: white;
+  }
+  
+  .start{
+    margin-left: 9px;
+    text-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    font-size: 3.5vw;
+  }
+  
+  span{
+    font-size: smaller;
+    margin: 0;
+  }
+  
+  .stroke{
+    color: black;
+    -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 1.5px;
+    -webkit-text-stroke-color: black;
+  }
+  
+  
+  button{
+    cursor: pointer;
+  }
+  
+  h2{
+    color: white;
+  }
+  
+  #board3x3, #board5x5, #board7x7 {
+    padding: 0px;
+    margin: 0 auto;
+    border: 2px solid #181818;
+    border-collapse: collapse;
+    cursor: pointer;
+  }
+  
+  tr td {
+    width: 60px;
+    height: 60px;
+  }
+  
+  tr:nth-child(n) td:nth-child(n + 1) {
+    background: #272727;
+  }
+  
+  tr:nth-child(2n) td:nth-child(2n + 1) {
+    background: #9f9f9f;
+    cursor: pointer;
+  }
+  
+  tr:nth-child(2n + 1) td:nth-child(2n) {
+    background: #9f9f9f;
+    cursor: pointer;
+  }
+  
+  #peca, #dama{
+    cursor: pointer;
+  }
+  
+  #peca.black,#dama.black {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    color: white;
+    background-color: black;
+  }
+  
+  #dama{
+    display: flex;
+    font-size: xx-large;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  #peca.white,#dama.white {
+    width: 100%;
+    height: 100%;
+    color: black;
+    border-radius: 50%;
+    background-color: white;
+  }
+  
+  #board .black:hover {
+    background-color: rgba(0, 128, 0, 0.5);
+  }
+  #board .white:hover {
+    background-color: rgba(0, 128, 0, 0.5);
+  }
+  
+  table tr td.vermelho {
+    background-color: red !important;
+  }
+  table tr td.amarelo {
+    background-color: yellow !important;
+  }
+  table tr td.verde {
+    background-color: green !important;
+  }
+  
+  #controle{
+    background-color: gray;
+    padding: 8px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+  }
+  
+  
+  
+  .box{
+    display: flex;
+    flex-direction: column;
+    padding: 1%;
+  }
