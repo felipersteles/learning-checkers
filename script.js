@@ -30,6 +30,17 @@ const initialPieces = [
   { posY: 7, posX: 6, color: "white" },
 ];
 
+const testUseCaseEatPiece = [
+  { posY: 7, posX: 0, color: "white" },
+  { posY: 6, posX: 1, color: "black" },
+  { posY: 4, posX: 3, color: "black" },
+  { posY: 2, posX: 1, color: "black" },
+  { posY: 4, posX: 1, color: "black" },
+  { posY: 2, posX: 5, color: "black" },
+  { posY: 2, posX: 3, color: "black" },
+  { posY: 4, posX: 5, color: "black" },
+];
+
 // ---------------------------------------------------------------------------------------------------------------------------------
 
 class Position {
@@ -86,6 +97,16 @@ class Piece {
   };
 }
 
+class Movement {
+  square;
+  eatPiece;
+
+  constructor(square, eatPiece) {
+    this.square = square;
+    this.eatPiece = eatPiece;
+  }
+}
+
 class Board {
   row;
   column;
@@ -132,7 +153,7 @@ class Board {
 }
 
 // I tried to use it on update function but the dom does not recognize
-var possibleMoves;
+var possibleMoves = [];
 var selectedPiece = null;
 var whiteTurn;
 
@@ -157,7 +178,8 @@ class CheckersGame {
           clearPossibleMoves();
 
           selectedPiece = element;
-          possibleMoves = verifyMovements(element, isWhite(element));
+          verifyMovements(element.parentNode, isWhite(element), possibleMoves);
+          drawPossibleMoves();
         }
 
         if (!isWhite(element) && isPiece(element)) {
@@ -168,7 +190,8 @@ class CheckersGame {
           clearPossibleMoves();
 
           selectedPiece = element;
-          possibleMoves = verifyMovements(element, isWhite(element));
+          verifyMovements(element.parentNode, isWhite(element), possibleMoves);
+          drawPossibleMoves();
         }
 
         if (isWhite(element) && isPiece(element)) {
@@ -177,8 +200,15 @@ class CheckersGame {
       }
 
       if (selectedPiece && !isPiece(element)) {
-        if (possibleMoves.includes(element))
+        const moves = possibleMoves.map((move) => {
+          return move.square;
+        });
+
+        console.log(moves);
+
+        if (moves.includes(element)) {
           move(getPieceSquare(selectedPiece), element);
+        }
       }
     };
   }
@@ -190,7 +220,7 @@ generateButton.onclick = () => {
   board = new Board(8, 8);
 
   board.generate();
-  board.positionPieces(initialPieces);
+  board.positionPieces(testUseCaseEatPiece);
 
   game = new CheckersGame(board);
   game.start();
@@ -208,6 +238,12 @@ const isPiece = (element) => {
   return element.id === "peca";
 };
 
+const hasAEnemyPiece = (square, color) => {
+  return (
+    square && square.firstChild && square.firstChild.classList.value !== color
+  );
+};
+
 const emptySquare = (square) => {
   return square && square.firstChild === null;
 };
@@ -220,13 +256,15 @@ const getPieceSquare = (piece) => {
 
 const getPosition = (square) => {
   const position = square.getAttribute("pos");
+  if (!position) return null;
+
   const x = position.split(",")[0];
   const y = position.split(",")[1];
 
   return new Position(x, y);
 };
 
-const squareFromPosition = (pos) => {
+const getSquareFromPosition = (pos) => {
   if (!pos) return null;
 
   return document.querySelector(`td[pos="${pos.x},${pos.y}"]`);
@@ -243,26 +281,98 @@ const move = (src, target) => {
   whiteTurn = !whiteTurn;
 };
 
-const verifyMovements = (piece, isWhite) => {
-  var possibleMoves = [];
-  const pos = getPosition(piece.parentNode);
+const verifyMovements = (
+  pieceSquare,
+  isWhite,
+  possibleMoves,
+  isLeft = null
+) => {
+  const pos = getPosition(pieceSquare);
+  const color = isWhite ? "white" : "black";
 
-  const westSquare = squareFromPosition(isWhite ? pos.nw() : pos.sw());
-  const eastSquare = squareFromPosition(isWhite ? pos.ne() : pos.se());
+  const west = isWhite ? pos.nw() : pos.sw();
+  const east = isWhite ? pos.ne() : pos.se();
 
-  // going to northeast position
-  if (emptySquare(westSquare)) possibleMoves.push(westSquare);
-  if (emptySquare(eastSquare)) possibleMoves.push(eastSquare);
+  const westSquare = getSquareFromPosition(west);
+  const eastSquare = getSquareFromPosition(east);
 
-  drawPossibleMoves(possibleMoves);
-  return possibleMoves;
+  var aux = [];
+
+  // simple move
+  if (emptySquare(westSquare) && isLeft == null)
+    possibleMoves.push(new Movement(westSquare, null));
+  if (emptySquare(eastSquare) && isLeft == null)
+    possibleMoves.push(new Movement(eastSquare, null));
+
+  // eat piece
+  if (hasAEnemyPiece(westSquare, color)) {
+    const nextPos = isWhite
+      ? getPosition(westSquare).nw()
+      : getPosition(westSquare).sw();
+
+    // enemy piece is disprotected
+    const nextSquare = getSquareFromPosition(nextPos);
+    if (emptySquare(nextSquare)) {
+      // const eatingPieces = possibleMoves.map((move) => {
+      //   return move.eatPiece;
+      // });
+
+      console.log("coming from", pieceSquare);
+      console.log("eating", westSquare);
+      console.log("going to", nextSquare);
+
+      possibleMoves.push(new Movement(nextSquare, westSquare));
+      verifyMovements(nextSquare, isWhite, possibleMoves, isLeft);
+      if (!isLeft) {
+        console.log("indo pra direita ou saindo");
+        console.log("podar");
+        const squares = possibleMoves.map((move) => {
+          return move.square;
+        });
+        const eat = possibleMoves.map((move) => {
+          return move.eatPiece;
+        });
+        aux.push({ squares, eat });
+      }
+      // if (!isEating) console.log("voltando");
+    }
+  }
+
+  if (hasAEnemyPiece(eastSquare, color)) {
+    const nextPos = isWhite
+      ? getPosition(eastSquare).ne()
+      : getPosition(eastSquare).se();
+
+    const nextSquare = getSquareFromPosition(nextPos);
+    if (emptySquare(nextSquare)) {
+      console.log("coming from", pieceSquare);
+      console.log("eating", eastSquare);
+      console.log("going to", nextSquare);
+
+      possibleMoves.push(new Movement(nextSquare, eastSquare));
+      verifyMovements(nextSquare, isWhite, possibleMoves, !isLeft);
+      if (isLeft) {
+        console.log("indo pra esquerda ou saindo");
+        console.log("podar");
+        const squares = possibleMoves.map((move) => {
+          return move.square;
+        });
+        const eat = possibleMoves.map((move) => {
+          return move.eatPiece;
+        });
+        aux.push({ squares, eat });
+      }
+    }
+  }
+
+  console.log("Possible moves:", aux);
 };
 
-const drawPossibleMoves = (m) => {
-  if (!m || m.length === 0) return;
+const drawPossibleMoves = () => {
+  if (!possibleMoves || possibleMoves.length === 0) return;
 
-  m.forEach((mov) => {
-    draw(mov, "verde");
+  possibleMoves.forEach((mov) => {
+    draw(mov.square, "verde");
   });
 };
 
@@ -271,10 +381,10 @@ const clearPossibleMoves = () => {
 
   if (possibleMoves.length > 0)
     possibleMoves.forEach((mov) => {
-      clear(mov, "verde");
+      clear(mov.square, "verde");
     });
 
-  possibleMoves = null;
+  possibleMoves = [];
 };
 
 const draw = (casa, cor) => {
